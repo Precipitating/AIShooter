@@ -3,9 +3,12 @@
 WIDTH: int = 1920
 HEIGHT: int = 1080
 FPS: int = 60
-PLAYER_START_X: int = int(WIDTH / 2) - 100
-PLAYER_START_Y: int = int(HEIGHT / 2) - 50
-PLAYER_SIZE: float = 0.5
+PLAYER_START_X: int = int(WIDTH / 2) - 40
+PLAYER_START_Y: int = int(HEIGHT / 2) - 10
+PLAYER_SIZE: float = 0.3
 PLAYER_SPEED: int = 10
 BOX_BOUNDARY_TOP: int = int(WIDTH / 2)
 PLAYER_BOUNDARY_Y: int = int(HEIGHT / 2)
+ROTATE_SPEED: int = 10
+CIRCLE_RADIUS: int = 2
+ENEMY_COUNT: int = 50

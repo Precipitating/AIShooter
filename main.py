@@ -3,6 +3,7 @@ from sys import exit
 import math
 from settings import *
 from Player import *
+from Enemy import *
 
 pygame.init()
 
@@ -13,6 +14,13 @@ clock = pygame.time.Clock()
 
 # Player
 player = Player()
+# Enemies
+enemies = [Enemy() for _ in range(ENEMY_COUNT)]
+
+for i in range(len(enemies)):
+    x, y = position_in_circle(CIRCLE_RADIUS, i)
+    enemies[i].pos.x += x * 250
+    enemies[i].pos.y += y * 250
 
 while True:
     keys = pygame.key.get_pressed()
@@ -26,6 +34,13 @@ while True:
     screen.blit(player.image, player.rect)
     player.update()
     pygame.draw.rect(screen, "green", player.hitbox_rect, 2)
+
+    # Enemy Update
+    for enemy in enemies:
+        screen.blit(enemy.image, enemy.rect)
+        pygame.draw.rect(screen, "green", enemy.hitbox_rect, 2)
+        enemy.face_player(playerPos=player.rect)
+        enemy.update()
 
     pygame.display.update()
     clock.tick(FPS)
