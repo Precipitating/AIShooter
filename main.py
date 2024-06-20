@@ -23,8 +23,9 @@ while True:
 
     screen.fill((0, 0, 0))
     pygame.draw.rect(screen, (255, 0, 0), pygame.Rect(770, 400, 300, 300), 2)
-    screen.blit(player.image, player.pos)
+    screen.blit(player.image, player.rect)
     player.update()
+    pygame.draw.rect(screen, "green", player.hitbox_rect, 2)
 
     pygame.display.update()
     clock.tick(FPS)
