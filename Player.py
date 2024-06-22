@@ -1,5 +1,5 @@
 import math
-
+from Bullet import *
 import pygame
 from settings import *
 
@@ -7,7 +7,6 @@ from settings import *
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
-
         self.image = pygame.transform.rotozoom(pygame.image.load("img/player.png").convert_alpha(), 0, PLAYER_SIZE)
         self.pos = pygame.math.Vector2(PLAYER_START_X, PLAYER_START_Y)
         self.base_player_img = self.image
@@ -15,8 +14,19 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.hitbox_rect.copy()
         self.speed = PLAYER_SPEED
         self.rot = 0
+        self.shoot = False
+        self.shoot_delay = 0
+
+    def is_shooting(self):
+        if self.shoot_delay <= 0:
+            self.shoot_delay = PLAYER_SHOOT_COOLDOWN
+            spawned_bullet_pos = self.pos
+            self.bullet = Bullet(spawned_bullet_pos[0], spawned_bullet_pos[1], self.rot, Owner.PLAYER)
+            bullet_group.add(self.bullet)
+            all_sprites_group.add(self.bullet)
 
     def player_rotation(self):
+
         keys = pygame.key.get_pressed()
         if keys[pygame.K_RIGHT]:
             self.rot -= ROTATE_SPEED
@@ -53,6 +63,13 @@ class Player(pygame.sprite.Sprite):
             self.velocity_x /= math.sqrt(2)
             self.velocity_y /= math.sqrt(2)
 
+        # shoot
+        if keys[pygame.K_SPACE]:
+            self.shoot = True
+            self.is_shooting()
+        else:
+            self.shoot = False
+
     def move(self):
         self.pos += pygame.math.Vector2(self.velocity_x, self.velocity_y)
         self.hitbox_rect.center = self.pos
@@ -63,4 +80,6 @@ class Player(pygame.sprite.Sprite):
         self.move()
         self.player_rotation()
 
+        if self.shoot_delay > 0:
+            self.shoot_delay -= 1
 

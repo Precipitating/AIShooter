@@ -1,6 +1,8 @@
 import math
 import pygame
 from settings import *
+from groups import *
+from Bullet import *
 
 
 class Enemy(pygame.sprite.Sprite):
@@ -12,17 +14,31 @@ class Enemy(pygame.sprite.Sprite):
         self.hitbox_rect = self.base_player_img.get_rect(center=self.pos)
         self.rect = self.hitbox_rect.copy()
         self.rot = 0
+        self.shoot_delay = 0
+        self.shoot = True
 
     def face_player(self, playerPos):
         # angle between enemy -> player pos
-        angle = math.degrees(math.atan2(playerPos.x - self.rect.x, -(playerPos.y - self.rect.y)))
-        self.rot = -angle
+        angle = math.degrees(math.atan2(-(playerPos.y - self.rect.y), playerPos.x - self.rect.x))
+        self.rot = angle
         self.image = pygame.transform.rotate(self.base_player_img, self.rot)
 
     def update(self):
         self.rect = self.image.get_rect(center=self.hitbox_rect.center)
         self.hitbox_rect.center = self.pos
         self.rect.center = self.hitbox_rect.center
+        self.is_shooting()
+
+        if self.shoot_delay > 0:
+            self.shoot_delay -= 1
+
+    def is_shooting(self):
+        if self.shoot_delay <= 0:
+            self.shoot_delay = ENEMY_SHOOT_COOLDOWN
+            spawned_bullet_pos = self.pos
+            self.bullet = Bullet(spawned_bullet_pos[0], spawned_bullet_pos[1], self.rot, Owner.ENEMY)
+            bullet_group.add(self.bullet)
+            all_sprites_group.add(self.bullet)
 
 
 def position_in_circle(radius, index):
