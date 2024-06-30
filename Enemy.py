@@ -1,7 +1,3 @@
-import math
-import pygame
-from settings import *
-from groups import *
 from Bullet import *
 
 
