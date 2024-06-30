@@ -1,4 +1,3 @@
-import pygame
 import math
 from settings import *
 from groups import *

@@ -2,7 +2,6 @@ import os
 import pickle
 from shooterenv import *
 
-
 local_dir = os.path.dirname(__file__)
 config_path = os.path.join(local_dir, "config2.txt")
 
@@ -18,7 +17,7 @@ def eval_genomes(genomes, config):
 
 
 def run_neat(config):
-   # p = neat.Checkpointer.restore_checkpoint('finished')
+    # p = neat.Checkpointer.restore_checkpoint('neat-checkpoint-169')
     p = neat.Population(config)
     p.config.inputs = 8
     p.add_reporter(neat.StdOutReporter(True))
@@ -29,6 +28,7 @@ def run_neat(config):
     with open("best.pickle", "wb") as f:
         pickle.dump(winner, f)
 
+
 def test_ai(config):
     with open("best.pickle", "rb") as f:
         pickle.load(f)
@@ -36,10 +36,3 @@ def test_ai(config):
 
 
 run_neat(config)
-
-
-
-
-
-
-

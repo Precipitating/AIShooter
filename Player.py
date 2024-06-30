@@ -1,8 +1,7 @@
-import math
 from Bullet import *
 import pygame
 from settings import *
-import time
+
 
 
 class Player(pygame.sprite.Sprite):
