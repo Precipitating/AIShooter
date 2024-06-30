@@ -16,6 +16,7 @@ class Enemy(pygame.sprite.Sprite):
         self.rot = 0
         self.shoot_delay = 0
         self.shoot = True
+        self.idx = 0
 
     def face_player(self, playerPos):
         # angle between enemy -> player pos

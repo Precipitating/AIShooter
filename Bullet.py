@@ -40,7 +40,11 @@ class Bullet(pygame.sprite.Sprite):
 
     def bullet_hit(self):
         if self.owner == Owner.PLAYER:
-            if pygame.sprite.spritecollide(self, enemy_group, True):
+            potential_enemy_kills = pygame.sprite.spritecollide(self, enemy_group, True)
+            # add enemy idx to kill list
+            if potential_enemy_kills:
+                for enemy in potential_enemy_kills:
+                    enemies_killed_list.append(enemy.idx)
                 self.kill()
         elif self.owner == Owner.ENEMY:
             if pygame.sprite.spritecollide(self, player_group, True):

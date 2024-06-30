@@ -1,97 +1,45 @@
-import pygame
-from sys import exit
-import math
-from settings import *
-from Player import *
-from Enemy import *
-from groups import *
-
-pygame.init()
-comic_sans = pygame.font.SysFont('Comic Sans MS', 100)
-
-# Create Window
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Impossible Shooter")
-clock = pygame.time.Clock()
-
-player = None
-enemies = None
+import os
+import pickle
+from shooterenv import *
 
 
-def reset():
-    player_group.empty()
-    all_sprites_group.empty()
-    bullet_group.empty()
-    enemy_group.empty()
+local_dir = os.path.dirname(__file__)
+config_path = os.path.join(local_dir, "config2.txt")
 
-    # Player
-    global player
-    player = Player()
-    global enemies
-    # Enemies
-    enemies = [Enemy() for _ in range(ENEMY_COUNT)]
-
-    all_sprites_group.add(player)
-    player_group.add(player)
-
-    # setup enemy circle positioning & unique shoot delay
-    delay_offset = 100
-    for i in range(len(enemies)):
-        x, y = position_in_circle(CIRCLE_RADIUS, i)
-        enemies[i].pos.x += x * 250
-        enemies[i].pos.y += y * 250
-        enemies[i].shoot_delay += delay_offset
-        delay_offset += 100
-        all_sprites_group.add(enemies[i])
-        enemy_group.add(enemies[i])
+config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction, neat.DefaultSpeciesSet, neat.DefaultStagnation,
+                     config_path)
 
 
-reset()
-# Game State
-game_over = False
-win = False
-while True:
-    keys = pygame.key.get_pressed()
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            exit()
-        if event.type == pygame.KEYUP:
-            if event.key == pygame.K_RETURN:
-                if game_over or win:
-                    reset()
-                    game_over = False
-                    win = False
-    # if dead
-    if len(player_group) == 0 and not game_over:
-        game_over = True
-    # if win
-    if len(player_group) == 1 and len(enemy_group) == 0:
-        win = True
+def eval_genomes(genomes, config):
+    for i, (genome_id1, genome1) in enumerate(genomes):
+        genome1.fitness = 0
+        game = Game()
+        game.train_ai(genome1, config)
 
-    screen.fill((0, 0, 0))
 
-    if game_over:
-        text_surface = comic_sans.render('Game Over', True, (255, 255, 255))
-        screen.blit(text_surface, (650, 300))
-        text_surface = comic_sans.render('Press Enter to restart', True, (255, 255, 255))
-        screen.blit(text_surface, (450, 500))
-    elif win:
-        text_surface = comic_sans.render('You Won!', True, (255, 255, 255))
-        screen.blit(text_surface, (650, 300))
-        text_surface = comic_sans.render('Press Enter to restart', True, (255, 255, 255))
-        screen.blit(text_surface, (450, 500))
-    else:
-        pygame.draw.rect(screen, (255, 0, 0), pygame.Rect(770, 400, 300, 300), 2)
-        pygame.draw.rect(screen, "green", player.hitbox_rect, 2)
+def run_neat(config):
+   # p = neat.Checkpointer.restore_checkpoint('finished')
+    p = neat.Population(config)
+    p.config.inputs = 8
+    p.add_reporter(neat.StdOutReporter(True))
+    stats = neat.StatisticsReporter()
+    p.add_reporter(stats)
+    p.add_reporter(neat.Checkpointer(1))
+    winner = p.run(eval_genomes, 200)
+    with open("best.pickle", "wb") as f:
+        pickle.dump(winner, f)
 
-        all_sprites_group.draw(screen)
-        all_sprites_group.update()
+def test_ai(config):
+    with open("best.pickle", "rb") as f:
+        pickle.load(f)
+    game = Game()
 
-        # Enemy Update
-        for enemy in enemies:
-            pygame.draw.rect(screen, "green", enemy.hitbox_rect, 2)
-            enemy.face_player(playerPos=player.rect)
 
-    pygame.display.update()
-    clock.tick(FPS)
+run_neat(config)
+
+
+
+
+
+
+
